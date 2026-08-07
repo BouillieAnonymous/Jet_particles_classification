@@ -1,0 +1,3 @@
+[submodule "QCDJetsMachineLearning"]
+	path = QCDJetsMachineLearning
+	url = https://github.com/cernopendata-datascience/QCDJetsMachineLearning

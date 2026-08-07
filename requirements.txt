@@ -1,0 +1,6 @@
+awkward>=2.0
+jupyterlab>=4.0
+matplotlib>=3.8
+numpy>=1.26
+uproot>=5.0
+
