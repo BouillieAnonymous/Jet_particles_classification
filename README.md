@@ -29,8 +29,11 @@ arrays with one value per particle-flow candidate.
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-lock.txt
 ```
+
+`requirements.txt` lists the direct project dependencies;
+`requirements-lock.txt` records the complete tested environment.
 
 Inspect the ROOT file from the repository root with:
 
@@ -38,3 +41,12 @@ Inspect the ROOT file from the repository root with:
 python scripts/inspect_root.py
 ```
 
+## Python environment
+
+The project is pinned to Python 3.12 and a modern TensorFlow/Keras stack. In
+VS Code, use `.venv\Scripts\python.exe` as the notebook kernel.
+
+```powershell
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
