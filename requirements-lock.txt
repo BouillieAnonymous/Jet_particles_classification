@@ -1,3 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cu130
+
 absl-py==2.5.0
 anyio==4.14.2
 argon2-cffi==25.1.0
@@ -120,7 +122,7 @@ termcolor==3.3.0
 terminado==0.18.1
 threadpoolctl==3.6.0
 tinycss2==1.5.1
-torch==2.13.0
+torch==2.13.0+cu130
 tornado==6.5.8
 traitlets==5.16.1
 typing_extensions==4.16.0
