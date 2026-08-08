@@ -43,8 +43,8 @@ python scripts/inspect_root.py
 
 ## Python environment
 
-The project is pinned to Python 3.12 and a modern TensorFlow/Keras stack. In
-VS Code, use `.venv\Scripts\python.exe` as the notebook kernel.
+The project is pinned to Python 3.12 with modern TensorFlow/Keras and PyTorch
+stacks. In VS Code, use `.venv\Scripts\python.exe` as the notebook kernel.
 
 ```powershell
 .venv\Scripts\Activate.ps1
