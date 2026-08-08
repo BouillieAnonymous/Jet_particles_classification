@@ -44,9 +44,8 @@ python scripts/inspect_root.py
 ## Python environment
 
 The project is pinned to Python 3.12 with modern TensorFlow/Keras and a
-CUDA 13.0-enabled PyTorch stack. The GPU setup has been verified on an NVIDIA
-GeForce RTX 5060 Laptop GPU. In VS Code, use `.venv\Scripts\python.exe` as the
-notebook kernel.
+CUDA 13.0-enabled PyTorch stack. In VS Code, use `.venv\Scripts\python.exe` as
+the notebook kernel.
 
 ```powershell
 .venv\Scripts\Activate.ps1
