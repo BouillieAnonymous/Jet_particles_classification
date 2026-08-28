@@ -15,6 +15,24 @@ QCDJetsMachineLearning/
                 Upstream CERN example repository (Git submodule)
 ```
 
+## Recommended workflow
+
+1. Put one ROOT file in `data/raw/` as described in `data/README.md`.
+2. Run `notebooks/01_explore_data.ipynb` for the fixed geometric k-NN baseline.
+3. Run `notebooks/02_dynamicgraph.ipynb` for the dynamic EdgeConv model.
+
+The dynamic model is implemented in `jet_gnn.py` with native PyTorch k-NN
+construction plus ordinary PyG `EdgeConv`. It rebuilds neighbours after each
+message-passing layer without relying on `DynamicEdgeConv`, `pyg-lib`, or
+`torch-cluster`.
+
+Run its unit tests from the repository root with:
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+
 The ROOT dataset is intentionally not tracked by Git. See
 [`data/README.md`](data/README.md) for its source and loading instructions.
 
