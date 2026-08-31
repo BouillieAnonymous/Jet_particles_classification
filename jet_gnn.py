@@ -57,10 +57,10 @@ def build_batched_knn_edges(x: Tensor, batch: Tensor, k: int) -> Tensor:
     return torch.cat(edge_parts, dim=1)
 
 
-class JetGNN(nn.Module):
-    """Two-layer dynamic EdgeConv classifier returning one logit per jet."""
+class EdgeConvJetClassifier(nn.Module):
+    """Shared two-layer EdgeConv architecture for controlled comparisons."""
 
-    def __init__(self, num_features: int, k: int = 8) -> None:
+    def __init__(self, num_features: int, k: int = 8, dynamic: bool = True) -> None:
         super().__init__()
         if num_features < 1:
             raise ValueError("num_features must be at least 1")
@@ -68,6 +68,7 @@ class JetGNN(nn.Module):
             raise ValueError("k must be at least 1")
 
         self.k = k
+        self.dynamic = dynamic
         self.conv1 = EdgeConv(
             nn=nn.Sequential(
                 nn.Linear(2 * num_features, 64),
@@ -91,13 +92,50 @@ class JetGNN(nn.Module):
             nn.Linear(64, 1),
         )
 
-    def forward(self, x: Tensor, batch: Tensor) -> Tensor:
-        edge_index = build_batched_knn_edges(x, batch, self.k)
-        x = torch.relu(self.conv1(x, edge_index))
+    def forward(
+        self,
+        x: Tensor,
+        pos: Tensor,
+        batch: Tensor,
+        *,
+        return_edge_indices: bool = False,
+    ) -> Tensor | tuple[Tensor, dict[str, Tensor]]:
+        """Classify jets while keeping geometry separate from node features."""
+        if pos.ndim != 2 or pos.size(0) != x.size(0) or pos.size(1) != 2:
+            raise ValueError("pos must have shape [num_nodes, 2] for dEta/dPhi")
 
-        # Rebuild the graph in the learned 64-dimensional feature space.
-        edge_index = build_batched_knn_edges(x, batch, self.k)
-        x = torch.relu(self.conv2(x, edge_index))
+        geometric_edges = build_batched_knn_edges(pos, batch, self.k)
+        hidden = torch.relu(self.conv1(x, geometric_edges))
+        second_edges = (
+            build_batched_knn_edges(hidden, batch, self.k)
+            if self.dynamic
+            else geometric_edges
+        )
+        hidden = torch.relu(self.conv2(hidden, second_edges))
 
-        graph_features = global_mean_pool(x, batch)
-        return self.classifier(graph_features).squeeze(-1)
+        graph_features = global_mean_pool(hidden, batch)
+        logits = self.classifier(graph_features).squeeze(-1)
+        if return_edge_indices:
+            return logits, {
+                "geometric": geometric_edges,
+                "second": second_edges,
+            }
+        return logits
+
+
+class FixedJetGNN(EdgeConvJetClassifier):
+    """EdgeConv model that reuses the geometric graph in both layers."""
+
+    def __init__(self, num_features: int, k: int = 8) -> None:
+        super().__init__(num_features=num_features, k=k, dynamic=False)
+
+
+class DynamicJetGNN(EdgeConvJetClassifier):
+    """EdgeConv model that rebuilds the second graph in latent space."""
+
+    def __init__(self, num_features: int, k: int = 8) -> None:
+        super().__init__(num_features=num_features, k=k, dynamic=True)
+
+
+# Preserve the established public name while giving it the corrected semantics.
+JetGNN = DynamicJetGNN
